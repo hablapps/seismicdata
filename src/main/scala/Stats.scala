@@ -29,7 +29,8 @@ object Stats extends App {
   implicit val cs = IO.contextShift(ExecutionContexts.synchronous)
   val xa = Transactor.fromDriverManager[IO](
     "org.postgresql.Driver",
-    "jdbc:postgresql://pct-empresas-122.uc3m.es:5432/ign",
+    // "jdbc:postgresql://pct-empresas-122.uc3m.es:5432/ign",
+    "jdbc:postgresql://localhost:5432/ign",
     "ign",
     "1234",
     Blocker.liftExecutionContext(ExecutionContexts.synchronous) // just for testing
