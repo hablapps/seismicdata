@@ -19,8 +19,7 @@ import edu.sc.seis.seisFile.mseed.{DataRecord, SeedRecord}
 import scala.concurrent.duration._
 
 
-case class SeedlinkProtocol()
-  extends GraphStage[BidiShape[String, ByteString, ByteString, ByteString]] {
+case class SeedlinkProtocol() extends GraphStage[BidiShape[String, ByteString, ByteString, ByteString]] {
 
   override def toString: String = "SeedlinkProtocol"
 
@@ -152,7 +151,7 @@ object SeedlinkProtocol{
   }
 
   def translateRecord(bs: ByteString): Try[SeismicRecord] =
-    ToSeismicRecord(
+    SeismicRecord(
       SeedRecord.read(bs.drop(8).toArray)
         .asInstanceOf[DataRecord]
     )
