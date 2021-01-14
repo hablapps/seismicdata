@@ -10,9 +10,9 @@ import scala.concurrent.duration._
 object Pipeline{
 	
 	def apply(config: Config)(implicit as: ActorSystem): RunnableGraph[(State, State)] = 
-	    SeedlinkProtocol(remoteStationNames/*.take(10)*/, config.seedlinkConf)
-			.map(Some.apply)//.take(20)
-			.merge(Source.tick(10.second, 1.minute, None).log("tick")/*.take(20)*/)
+	    SeedlinkProtocol(config.seedlinkConf)
+			.map(Some.apply)
+			.merge(Source.tick(10.second, 1.minute, None).log("tick"))
 			.via(UpdateStats.apply)
 			.toMat(psql.Persist(config.databaseConf))(Keep.left)
 			

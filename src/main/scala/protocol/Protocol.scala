@@ -80,9 +80,9 @@ case class SeedlinkProtocol() extends GraphStage[BidiShape[String, ByteString, B
 
 object SeedlinkProtocol{
 
-  def apply(stations: List[(String, String)], config: Config.Seedlink)(
+  def apply(config: Config.Seedlink)(
     implicit as: ActorSystem): Source[SeismicRecord, (PressureGauge.State, PressureGauge.State)] =
-    Source(stations)
+    Source(config.stations)
       .viaMat(
         BidiFlow.fromFlowsMat(
           commands.log("command").withAttributes(Attributes.logLevels(
@@ -108,7 +108,8 @@ object SeedlinkProtocol{
 
   def commands = {
     val now = LocalDateTime.now(TimeZone.getTimeZone("UTC").toZoneId)
-    val nowp = now.get(ChronoField.YEAR) + "," +
+    val nowp = 
+      now.get(ChronoField.YEAR) + "," +
       now.get(ChronoField.MONTH_OF_YEAR) + "," +
       now.get(ChronoField.DAY_OF_MONTH) + "," +
       now.get(ChronoField.HOUR_OF_DAY) + "," +
