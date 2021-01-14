@@ -1,6 +1,5 @@
-
 name := "seismicdata"
-scalaVersion := "2.12.10"
+scalaVersion := "2.13.4"
 version := "0.1"
 
 libraryDependencies ++= Seq(
@@ -11,12 +10,12 @@ libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "3.2.2" % "test",
   "org.postgresql" % "postgresql" % "42.2.10",
   "org.tpolecat" %% "doobie-postgres" % "0.8.8",
-  "org.tpolecat" %% "doobie-quill" % "0.8.8",
   "org.tpolecat" %% "doobie-hikari" % "0.8.8",
-  "edu.sc.seis" % "seisFile" % "1.8.4" exclude("org.slf4j", "slf4j-log4j12"))
+  "edu.sc.seis" % "seisFile" % "1.8.4" exclude("org.slf4j", "slf4j-log4j12"),
+  "com.github.pureconfig" %% "pureconfig" % "0.14.0")
 
-mainClass in (Compile, run) := Some("com.hablapps.seismicdata.Stats")
-mainClass in assembly := Some("com.hablapps.seismicdata.Stats")
+mainClass in (Compile, run) := Some("dev.habla.seismicdata.Main")
+mainClass in assembly := Some("dev.habla.seismicdata.Main")
 assemblyJarName in assembly := "seismicstats.jar"
 
 

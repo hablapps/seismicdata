@@ -1,4 +1,7 @@
-package dev.habla.seismicdata.protocol
+package dev.habla.seismicdata
+package protocol
+
+import utils._
 
 import java.util.TimeZone
 import java.time.LocalDateTime
@@ -78,7 +81,7 @@ case class SeedlinkProtocol()
 
 object SeedlinkProtocol{
 
-  def apply(stations: List[(String, String)], host: String, port: Int)(
+  def apply(stations: List[(String, String)], config: Config.Seedlink)(
     implicit as: ActorSystem): Source[SeismicRecord, (PressureGauge.State, PressureGauge.State)] =
     Source(stations)
       .viaMat(
@@ -92,7 +95,7 @@ object SeedlinkProtocol{
               bs
             })*/.via(accumulateRecords))(Keep.right)
         .atop(BidiFlow.fromGraph(SeedlinkProtocol()))
-        .join(Tcp().outgoingConnection(host, port)))(Keep.right)
+        .join(Tcp().outgoingConnection(config.host, config.port)))(Keep.right)
       .map(translateRecord)
       //.throttle(1, per=10.second)
       .viaMat(PressureGauge())(Keep.both)
