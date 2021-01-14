@@ -30,8 +30,7 @@ object Main extends App {
   val Right(config) = ConfigSource.default.load[Config]
 
   implicit val system: ActorSystem = ActorSystem("TCP_Server_Actor_System")
-  implicit val mat: ActorMaterializer = ActorMaterializer()
 
-  val (before, after) = Pipeline.apply(config).run
+  val (before, after) = Pipeline(config).run
 //  utils.PressureGauge.scheduleSamples(before, after)
 }
