@@ -3,6 +3,8 @@ package psql
 
 import java.time.LocalDateTime
 
+import scala.concurrent.Future
+
 import akka.stream.scaladsl._
 import akka.stream.Attributes
 import akka.event.Logging
@@ -17,7 +19,7 @@ import protocol._, stats._
 
 object Persist{
 
-  def apply(conf: Config.Database): Sink[(LocalDateTime, List[StationStat]), akka.NotUsed] = {
+  def apply(conf: Config.Database): Sink[(LocalDateTime, List[StationStat]), Future[akka.Done]] = {
 
     implicit val cs = IO.contextShift(ExecutionContexts.synchronous)
     implicit val xa = Transactor.fromDriverManager[IO](
@@ -39,7 +41,7 @@ object Persist{
         .log("persist error").withAttributes(Attributes.logLevels(
           onElement = Logging.ErrorLevel, onFinish = Logging.InfoLevel, onFailure = Logging.ErrorLevel))
         .to(Sink.ignore), _.isLeft)
-    .to(Sink.ignore)
+    .toMat(Sink.ignore)(Keep.right)
   }
 
   val insertStatsSQL =

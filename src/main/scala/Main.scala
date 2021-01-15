@@ -27,10 +27,15 @@ import _root_.doobie._, _root_.doobie.implicits._, javasql._, javatime._
 
 object Main extends App {
 
-  val Right(config) = ConfigSource.default.load[Config]
+	val Right(config) = ConfigSource.default.load[Config]
 
-  implicit val system: ActorSystem = ActorSystem("TCP_Server_Actor_System")
+	implicit val system: ActorSystem = ActorSystem("TCP_Server_Actor_System")
 
-  val (before, after) = Pipeline(config).run
-//  utils.PressureGauge.scheduleSamples(before, after)
+	val ((before, after), done) = Pipeline(config).run
+	//  utils.PressureGauge.scheduleSamples(before, after)
+
+	done.onComplete{ r => 
+		println(r)
+		system.terminate
+	}(system.dispatcher)
 }
