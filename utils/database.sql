@@ -43,5 +43,11 @@ CREATE OR REPLACE VIEW public.statistic
 
 GRANT ALL PRIVILEGES ON DATABASE ign TO ign;
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO ign;
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO ign;
+
+revoke usage on schema public from ign2;
+revoke all privileges on all tables in schema public from ign2;
+drop table stationstat cascade;
+drop database ign2;
+drop user ign2;
+
 

@@ -6,7 +6,6 @@ case class Station(
   def step: Int = (1000.0/frequency).toInt
 }
 
-
 object Station{
     case class Id(
         name: String,

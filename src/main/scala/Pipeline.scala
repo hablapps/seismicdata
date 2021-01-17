@@ -1,20 +1,36 @@
 package dev.habla.seismicdata
 
-import protocol._, psql._, stats._
-
 import akka.actor.ActorSystem
 import akka.stream.scaladsl.{RunnableGraph, Source, Keep}
-import utils.PressureGauge.State
+
 import scala.concurrent.duration._
 import scala.concurrent.Future
+import doobie.Transactor
+import cats.effect.IO
+
+import utils.PressureGauge.State
+import protocol._, psql._, stats._
 
 object Pipeline{
+
+	def start(config: Config): Unit = {
+		implicit val system: ActorSystem = ActorSystem("TCP_Server_Actor_System")
+		implicit val transactor: Transactor.Aux[IO, Unit] = psql.transactor(config.databaseConf)
+		
+		val ((before, after), done) = Pipeline(config).run
+		//  utils.PressureGauge.scheduleSamples(before, after)
+
+		done.onComplete{ r => 
+			println(r)
+			system.terminate
+		}(system.dispatcher)
+	}
+					
 	
-	def apply(config: Config)(implicit as: ActorSystem): RunnableGraph[((State, State), Future[akka.Done])] = 
+	def apply(config: Config)(implicit as: ActorSystem, xa: Transactor.Aux[IO, Unit]): RunnableGraph[((State, State), Future[akka.Done])] = 
 	    SeedlinkProtocol(config.seedlinkConf)
 			.map(Some.apply)
 			.merge(Source.tick(10.second, 1.minute, None).log("tick"))
 			.via(UpdateStats.apply)
-			.toMat(psql.Persist(config.databaseConf))(Keep.both)
-			
+			.toMat(psql.Persist.apply)(Keep.both)		
 }

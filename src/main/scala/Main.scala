@@ -1,41 +1,22 @@
 package dev.habla.seismicdata
 
+import caseapp._
 import pureconfig._
 import pureconfig.generic.auto._
 
-import java.time.LocalDateTime.now
-import java.time.temporal.ChronoUnit
-import java.time.LocalDateTime
+object Main extends CommandApp[Command] {
 
-import scala.collection.mutable
-import scala.concurrent.duration._
-import akka.stream.ActorMaterializer
-import akka.actor.ActorSystem
-import akka.stream.scaladsl.{Flow, Sink, Source, Tcp, Keep}
-import akka.stream.Attributes
-import akka.event.Logging
+	def run(command: Command, rargs: RemainingArgs): Unit =
+		ConfigSource.default.load[Config].fold(
+			println,
+			config => command match {
+				case args: InitDB => 
+					println(psql.InitDB(args)(config.databaseConf))
 
-import protocol._, stats._
-import java.util.concurrent.atomic.AtomicReference
-import scala.util.{Failure, Success}
+				case args: DropDB => 
+					println(psql.DropDB(args)(config.databaseConf))
 
-import scala.concurrent.Future
-import cats._, cats.syntax.all._, cats.data._, cats.instances.all._
-import cats.effect.IO, cats.effect.Blocker
-import fs2.Stream
-import _root_.doobie._, _root_.doobie.implicits._, javasql._, javatime._
-
-object Main extends App {
-
-	val Right(config) = ConfigSource.default.load[Config]
-
-	implicit val system: ActorSystem = ActorSystem("TCP_Server_Actor_System")
-
-	val ((before, after), done) = Pipeline(config).run
-	//  utils.PressureGauge.scheduleSamples(before, after)
-
-	done.onComplete{ r => 
-		println(r)
-		system.terminate
-	}(system.dispatcher)
+				case Start() => 
+					Pipeline.start(config)
+			})
 }

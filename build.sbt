@@ -3,6 +3,8 @@ scalaVersion := "2.13.4"
 version := "0.1"
 
 libraryDependencies ++= Seq(
+  "com.github.alexarchambault" %% "case-app" % "2.0.1",
+  "com.github.scopt" %% "scopt" % "4.0.0",
   "com.typesafe.akka" %% "akka-stream" % "2.6.8",
   "com.typesafe.akka" %% "akka-http" % "10.2.0",
   "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",

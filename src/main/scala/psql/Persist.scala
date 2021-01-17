@@ -11,25 +11,13 @@ import akka.event.Logging
 
 import cats._, cats.syntax.all._, cats.data._, cats.instances.all._
 import cats.effect.IO, cats.effect.Blocker
-import _root_.doobie._, _root_.doobie.implicits._, javasql._, javatime._
-
+import doobie._, doobie.implicits._, javasql._, javatime._
 
 import protocol._, stats._
 
-
 object Persist{
 
-  def apply(conf: Config.Database): Sink[(LocalDateTime, List[StationStat]), Future[akka.Done]] = {
-
-    implicit val cs = IO.contextShift(ExecutionContexts.synchronous)
-    implicit val xa = Transactor.fromDriverManager[IO](
-      "org.postgresql.Driver",
-      conf.url,
-      conf.user,
-      conf.password,
-      Blocker.liftExecutionContext(ExecutionContexts.synchronous) // just for testing
-    )
-
+  def apply(implicit xa: Transactor.Aux[IO, Unit]): Sink[(LocalDateTime, List[StationStat]), Future[akka.Done]] = 
     Flow[(LocalDateTime, List[StationStat])].mapAsync(1){
       case (minute, stats) =>
         //println(stats.find(_.station.id == Station.Id("CDIE","HN3","0K","ES"))+"\n\n")
@@ -42,7 +30,6 @@ object Persist{
           onElement = Logging.ErrorLevel, onFinish = Logging.InfoLevel, onFailure = Logging.ErrorLevel))
         .to(Sink.ignore), _.isLeft)
     .toMat(Sink.ignore)(Keep.right)
-  }
 
   val insertStatsSQL =
     """insert into stationStat
