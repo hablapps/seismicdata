@@ -1,6 +1,6 @@
 name := "seismicdata"
 scalaVersion := "2.13.4"
-version := "0.1"
+version := "0.8"
 
 val akkaVersion = "2.6.8"
 
@@ -20,6 +20,6 @@ libraryDependencies ++= Seq(
 
 mainClass in (Compile, run) := Some("dev.habla.seismicdata.Main")
 mainClass in assembly := Some("dev.habla.seismicdata.Main")
-assemblyJarName in assembly := "seismicstats.jar"
+assemblyJarName in assembly := "seismicstats-" + version.value + ".jar"
 
 

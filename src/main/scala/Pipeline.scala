@@ -20,21 +20,20 @@ object Pipeline{
 
 	def start(config: Config): Unit = 
 		psql.transactor(config.databaseConf).fold(
-			println, 
+			System.err.println, 
 			implicit transactor => {
 				implicit val system: ActorSystem = ActorSystem("TCP_Server_Actor_System")
 
 				val ((before, after), done) = Pipeline(config).run
 				//  utils.PressureGauge.scheduleSamples(before, after)
 
-				done.onComplete{ r => 
-					println(r)
+				done.onComplete{ result => 
+					result.fold(System.err.println, println)
 					system.terminate
 				}(system.dispatcher)
 			}
 		)
 					
-	
 	def apply(config: Config)(implicit as: ActorSystem, xa: Transactor.Aux[IO, Unit]): RunnableGraph[((State, State), Future[akka.Done])] = 
 	    SeedlinkProtocol(config.seedlinkConf)
 			.map(Some.apply)

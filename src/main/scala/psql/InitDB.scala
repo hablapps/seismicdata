@@ -11,11 +11,11 @@ import cats.effect.IO, cats.effect.Blocker
 object InitDB{
 	
 	def apply(cmd: seismicdata.InitDB)(conf: Config.Database): Either[Throwable, Unit] = for {
-		xa <- transactor(cmd.url, cmd.user, cmd.pwd)
+		xa <- transactor(conf.url, cmd.user, cmd.pwd)
 		_ <- xa.rawTrans.apply(
 			createDb(conf.dbname) *>
 			createRole(conf.dbname, conf.user, conf.password)).attempt.unsafeRunSync
-		xa2 <- transactor(cmd.url+conf.dbname, cmd.user, cmd.pwd)
+		xa2 <- transactor(conf.url+conf.dbname, cmd.user, cmd.pwd)
 		_ <- xa2.rawTrans.apply(
 			createTableAndView *> 
 			givePermissions(conf.user)).attempt.unsafeRunSync

@@ -11,10 +11,10 @@ object Main extends CommandApp[Command] {
 			println,
 			config => command match {
 				case args: InitDB => 
-					println(psql.InitDB(args)(config.databaseConf))
+					psql.InitDB(args)(config.databaseConf).fold(System.err.println, println)
 
 				case args: DropDB => 
-					println(psql.DropDB(args)(config.databaseConf))
+					psql.DropDB(args)(config.databaseConf).fold(System.err.println, println)
 
 				case Start() => 
 					Pipeline.start(config)

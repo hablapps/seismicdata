@@ -6,6 +6,7 @@ import scala.concurrent.duration._
 import akka.actor.ActorSystem
 import akka.stream.scaladsl._, Tcp._
 import akka.util.ByteString
+
 package object protocol{
 	
 	def tcpFlow(host: String, port: Int)(implicit system: ActorSystem): Future[Flow[ByteString, ByteString, Future[OutgoingConnection]]] = {
