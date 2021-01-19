@@ -22,6 +22,7 @@ object Persist{
       case (minute, stats) =>
         //println(stats.find(_.station.id == Station.Id("CDIE","HN3","0K","ES"))+"\n\n")
         //println(stats.find(_.station.id.name.startsWith("CDIE"))+"\n\n")
+        
         Update[StationStatInfo](insertStatsSQL)
           .updateMany(stats.map(stationInfo(minute)))
           .transact(xa).attempt.unsafeToFuture

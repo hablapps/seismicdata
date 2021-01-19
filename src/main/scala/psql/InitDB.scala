@@ -5,19 +5,22 @@ package psql
 import doobie._
 import doobie.implicits._
 
-import cats._, cats.syntax.all._
+import cats._, cats.syntax.all._ // , cats.implicits._
 import cats.effect.IO, cats.effect.Blocker
 
 object InitDB{
 	
-	def apply(cmd: seismicdata.InitDB)(conf: Config.Database): Either[Throwable, Int] = 
-		(transactor(cmd.url, cmd.user, cmd.pwd).rawTrans.apply(
+	def apply(cmd: seismicdata.InitDB)(conf: Config.Database): Either[Throwable, Unit] = for {
+		xa <- transactor(cmd.url, cmd.user, cmd.pwd)
+		_ <- xa.rawTrans.apply(
 			createDb(conf.dbname) *>
-			createRole(conf.dbname, conf.user, conf.password)) *> 
-		 transactor(cmd.url+conf.dbname, cmd.user, cmd.pwd).rawTrans.apply(
+			createRole(conf.dbname, conf.user, conf.password)).attempt.unsafeRunSync
+		xa2 <- transactor(cmd.url+conf.dbname, cmd.user, cmd.pwd)
+		_ <- xa2.rawTrans.apply(
 			createTableAndView *> 
-			givePermissions(conf.user))
-		).attempt.unsafeRunSync
+			givePermissions(conf.user)).attempt.unsafeRunSync
+	} yield ()
+
 	
 	def createDb(name: String): ConnectionIO[Int] = 
 		(fr0"CREATE DATABASE " ++ Fragment.const(name)).update.run

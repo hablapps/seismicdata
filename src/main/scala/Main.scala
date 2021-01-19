@@ -7,7 +7,7 @@ import pureconfig.generic.auto._
 object Main extends CommandApp[Command] {
 
 	def run(command: Command, rargs: RemainingArgs): Unit =
-		ConfigSource.default.load[Config].fold(
+		ConfigSource.default.at("seismic-data").load[Config].fold(
 			println,
 			config => command match {
 				case args: InitDB => 
