@@ -1,5 +1,8 @@
 log
+.application.conf
 
+.metals
+.bloop
 ##
 ## Scala-specific
 ##
