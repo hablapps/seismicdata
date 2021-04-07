@@ -8,3 +8,7 @@ several data-quality statistics on a postgresql database.
 ### INSTALLATION
 
 See the [INSTALL](./INSTALL) file.
+
+### LICENSE
+
+See [LICENSE](./LICENSE.txt) file.
